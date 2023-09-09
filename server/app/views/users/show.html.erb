@@ -1,0 +1,33 @@
+<h1>こんにちわ <%= @name %> さん</h1>
+<button id="logout">ログアウト</button>
+
+<script>
+  document.getElementById("logout").addEventListener("click", async function() {
+    const csrfToken = document.getElementsByName("csrf-token")[0].content
+    try {
+      const response = await fetch("/logout", {
+        method: "DELETE",
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken,
+        },
+      })
+
+      // ブラウザが勝手にリダイレクトしてくれるはず
+      // リダイレクト後になぜかDELETEメソッドを引き継いで、DELETEでログインページにリダイレクトしやがった
+      // おそらくブラウザの仕様的に無理なのかもしれない。なので、DELETEでOKを返すようにした
+      if (response.status == 200) {
+        // 同一ドメイン内であればパスを指定することで、そのドメインに属するページに遷移することができます。
+        location.href = "/login"
+
+      } else {
+        throw new Error("Network response was not ok")
+      }
+
+    } catch (error) {
+      console.error('DELETEリクエストが失敗しました', error);
+    }
+  })
+
+</script>
